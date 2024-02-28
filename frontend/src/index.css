@@ -1,0 +1,16 @@
+body {
+	text-align: center;
+	background-color: rgb(16, 15, 37);
+	color: white;
+}
+
+.App {
+	margin: 16px;
+}
+
+#morse {
+	font-size: 3em;
+	text-align: justify;
+	width: 100%;
+	word-wrap: break-word;
+}
