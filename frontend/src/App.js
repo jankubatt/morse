@@ -137,14 +137,14 @@ function App() {
 				</p>
 			</div>
 
-			<div className='bottom-buttons'>
+			<div className='bottom-buttons' onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
 				<button onClick={() => {
 					setMorse(prev => prev + "/")
 					clearTimeout(timerId.current);
 				}}>End Letter</button>
 
 				<button onClick={() => {
-					setMorse(prev => prev.slice(0, -1) + "-.-.-./")
+					setMorse(prev => prev + "-.-.-./")
 					clearTimeout(timerId.current);
 				}}>Space</button>
 
@@ -159,11 +159,11 @@ function App() {
 				}}>Backspace</button>
 			</div>
 
-			<button className='help-button' onClick={() => { setShowModal(true); setMorse(prev => prev.slice(0, -1)); clearTimeout(timerId.current); }}>?</button>
+			<button className='help-button' onClick={() => { setShowModal(true); }}>?</button>
 
 			{showModal && <div className='modal'>
 				<div className='modal-content'>
-					<div className='modal-close' onClick={() => { setShowModal(false); setMorse(prev => prev.slice(0, -1)); clearTimeout(timerId.current); }}>x</div>
+					<div className='modal-close' onClick={() => { setShowModal(false); }}>x</div>
 
 					<div>
 						<h2>Instructions</h2>
