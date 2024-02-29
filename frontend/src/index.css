@@ -2,10 +2,22 @@ body {
 	text-align: center;
 	background-color: rgb(16, 15, 37);
 	color: white;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-text-size-adjust: none;
+	user-select: none;
 }
 
 .App {
 	margin: 16px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	height: 90vh;
 }
 
 #morse {
@@ -13,4 +25,81 @@ body {
 	text-align: justify;
 	width: 100%;
 	word-wrap: break-word;
+	max-height: 50vh;
+	overflow-y: auto;
+}
+
+.solution {
+	user-select: none;
+	-webkit-touch-callout: none;
+}
+
+.bottom-buttons {
+	display: flex;
+	justify-content: space-evenly;
+}
+
+.bottom-buttons>button {
+	font-size: 1.5em;
+	padding: 8px;
+	background-color: rgb(16, 15, 37);
+	border: none;
+	box-shadow: 0 0 8px 0 rgba(255, 255, 255, 0.5);
+	border-radius: 8px;
+	color: white;
+	opacity: 0.5;
+	transition: 0.5s;
+
+}
+
+.bottom-buttons>button:hover {
+	opacity: 1;
+}
+
+.help-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 8px;
+	background-color: rgb(16, 15, 37);
+	border: none;
+	box-shadow: 0 0 8px 0 rgba(255, 255, 255, 0.5);
+	border-radius: 8px;
+	color: white;
+	opacity: 0.5;
+	transition: 0.5s;
+}
+
+.modal {
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+	background-color: rgb(16, 15, 37);
+	margin: 15% auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%;
+	display: flex;
+	flex-direction: column;
+}
+
+.modal-close {
+	align-self: flex-end;
+	padding: 8px;
+	background-color: rgb(16, 15, 37);
+	border: none;
+	box-shadow: 0 0 8px 0 rgba(255, 255, 255, 0.5);
+	border-radius: 8px;
+	color: white;
+	opacity: 0.5;
+	transition: 0.5s;
+	width: fit-content;
 }
