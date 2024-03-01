@@ -21,7 +21,7 @@ body {
 }
 
 #morse {
-	font-size: 3em;
+	font-size: 1.5em;
 	text-align: justify;
 	width: 100%;
 	word-wrap: break-word;
@@ -32,6 +32,13 @@ body {
 .solution {
 	user-select: none;
 	-webkit-touch-callout: none;
+}
+
+#score {
+	position: absolute;
+	bottom: 0;
+	right: 16px;
+	opacity: 0.5;
 }
 
 .bottom-buttons {

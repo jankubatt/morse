@@ -119,6 +119,12 @@ function App() {
 		setSolution(solutionArray.join('').replaceAll(";", " "))
 
 		if (solution === sentence && sentences.length > 0) {
+			if (localStorage.getItem('score') === null) {
+				localStorage.setItem('score', '1')
+			} else {
+				localStorage.setItem('score', (parseInt(localStorage.getItem('score')) + 1).toString())
+			}
+
 			setSentence(sentences[Math.floor(Math.random() * sentences.length)].toUpperCase().replace(".", ""))
 			setMorse('')
 		}
@@ -135,6 +141,7 @@ function App() {
 						return <span style={{ color: color }}>{char}</span>
 					})}
 				</p>
+				<p id='score'>Sentences written: {localStorage.getItem('score') || 0}</p>
 			</div>
 
 			<div className='bottom-buttons' onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
