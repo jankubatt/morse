@@ -1,5 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import '../App.css';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Cookies from 'js-cookie';
+import axios from 'axios';
 
 const MorsePage = () => {
 	const morseCode = {
@@ -8,16 +11,19 @@ const MorsePage = () => {
 		'.': '.-.-.-', ',': '--..--', '?': '..--..', '\'': '.----.', '!': '-.-.--', '/': '-..-.', '(': '-.--.', ')': '-.--.-', '&': '.-...', ':': '---...', ';': '-.-.-.', '=': '-...-', '+': '.-.-.', '-': '-....-', '_': '..--.-', '"': '.-..-.', '$': '...-..-', '@': '.--.-.'
 	}
 
-	const [morse, setMorse] = React.useState('')
-	const [solution, setSolution] = React.useState('')
-	const [sentences, setSentences] = React.useState([])
-	const [sentence, setSentence] = React.useState('')
-	const [showModal, setShowModal] = React.useState(false)
+	const [morse, setMorse] = useState('')
+	const [solution, setSolution] = useState('')
+	const [sentences, setSentences] = useState([])
+	const [sentence, setSentence] = useState('')
+	const [showModal, setShowModal] = useState(false)
+    const [user, setUser] = useState({});
 
-	const timerId = React.useRef(null);
-	const touchStart = React.useRef(0);
-	const touchStartPosition = React.useRef({ x: 0, y: 0 });
-	const touchEndPosition = React.useRef({ x: 0, y: 0 });
+    const navigate = useNavigate();
+
+	const timerId = useRef(null);
+	const touchStart = useRef(0);
+	const touchStartPosition = useRef({ x: 0, y: 0 });
+	const touchEndPosition = useRef({ x: 0, y: 0 });
 
 	const handleTouchStart = (e) => {
 		touchStart.current = performance.now();
@@ -45,7 +51,18 @@ const MorsePage = () => {
 		}, 2000);
 	};
 
-	React.useEffect(() => {
+    const fetchUser = async () => {
+        const response = await axios.post(`${process.env.REACT_APP_API}/users/`, { token: Cookies.get("token") });
+        return response.data;
+    };
+
+    useEffect(() => {
+        fetchUser().then((data) => {
+            setUser(data);
+        });
+    }, []);
+
+	useEffect(() => {
 		fetch('/sentences.json')
 			.then(response => response.json())
 			.then(json => {
@@ -111,7 +128,7 @@ const MorsePage = () => {
 		};
 	}, []);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		const morseArray = morse.split('/')
 		const solutionArray = morseArray.map((morse) => {
 			return Object.keys(morseCode).find(key => morseCode[key] === morse)
@@ -141,7 +158,10 @@ const MorsePage = () => {
 						return <span style={{ color: color }}>{char}</span>
 					})}
 				</p>
-				<p id='score'>Sentences written: {localStorage.getItem('score') || 0}</p>
+				<p id='score'>
+                    {user ? user.username : <><button onClick={() => navigate("/register")}>Register</button>/<button onClick={() => navigate("/login")}>Login</button></>}
+                    &nbsp;Sentences written: {localStorage.getItem('score') || 0}
+                </p>
 			</div>
 
 			<div className='bottom-buttons' onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
