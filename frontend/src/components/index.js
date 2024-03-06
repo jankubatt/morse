@@ -1,5 +1,7 @@
-import Stopwatch from "./Stopwatch";
+import ModalCompleted from "./Modals/ModalCompleted";
+import ModalHelp from "./Modals/ModalHelp";
 
 export {
-    Stopwatch
+    ModalCompleted,
+    ModalHelp
 };

@@ -3,20 +3,15 @@ import '../App.css';
 import React, { useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
-import { Stopwatch } from '../components';
+import { ModalCompleted, ModalHelp, Stopwatch } from '../components';
+import { formatTime, morseCode } from '../helpers';
 
 const MorsePage = () => {
-	const morseCode = {
-		'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--', 'Z': '--..',
-		'1': '.----', '2': '..---', '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.', '0': '-----',
-		'.': '.-.-.-', ',': '--..--', '?': '..--..', '\'': '.----.', '!': '-.-.--', '/': '-..-.', '(': '-.--.', ')': '-.--.-', '&': '.-...', ':': '---...', ';': '-.-.-.', '=': '-...-', '+': '.-.-.', '-': '-....-', '_': '..--.-', '"': '.-..-.', '$': '...-..-', '@': '.--.-.'
-	}
-
 	const [morse, setMorse] = useState('')
 	const [solution, setSolution] = useState('')
 	const [sentences, setSentences] = useState([])
 	const [sentence, setSentence] = useState('')
-	const [showModal, setShowModal] = useState(false)
+	const [modalHelp, setModalHelp] = useState(false)
 	const [modalCompleted, setModalCompleted] = useState(false)
 	const [user, setUser] = useState(null);
 
@@ -66,22 +61,11 @@ const MorsePage = () => {
 		return response.data;
 	};
 
-	const formatTime = (milliseconds) => {
-		const totalMilliseconds = Math.floor(milliseconds);
-		const minutes = Math.floor(totalMilliseconds / (60 * 1000));
-		const seconds = Math.floor((totalMilliseconds % (60 * 1000)) / 1000);
-		const millisecondsPart = totalMilliseconds % 1000;
-
-		const pad = (value) => (value < 10 ? `0${value}` : value);
-
-		return `${pad(minutes)}:${pad(seconds)}.${pad(millisecondsPart)}`;
-	};
-
 	const handleComplete = () => {
 		fetchUser().then((data) => {
 			setUser(data);
 		}).catch((e) => setUser(null));
-		
+
 		setSentence(sentences[Math.floor(Math.random() * sentences.length)].toUpperCase().replace(".", ""))
 		setMorse('')
 		setModalCompleted(false);
@@ -114,7 +98,7 @@ const MorsePage = () => {
 	}, [isRunning, startTime, elapsedTime]);
 
 	useEffect(() => {
-		fetch('/test.json')
+		fetch('/sentences.json')
 			.then(response => response.json())
 			.then(json => {
 				setSentences(json)
@@ -188,9 +172,6 @@ const MorsePage = () => {
 		setSolution(solutionArray.join('').replaceAll(";", " "))
 
 		if (morseArray[morseArray.length - 1] === "" && morseArray.length > 1) {
-			// console.log(morseArray)
-			// console.log(solution, sentence)
-
 			for (let i = 0; i < solution.length; i++) {
 				if (solution[i] !== sentence[i] && stats.mistakes.filter(mistake => mistake.index === i).length === 0) {
 					setStats(prev => {
@@ -222,42 +203,43 @@ const MorsePage = () => {
 					sentence: sentence,
 					ttc: ttc,
 					mistakes: stats.mistakes.length
-				}).then((response) => {
+				}).then(() => {
 					console.log("saved")
 				}).catch((e) => console.error(e));
 			}
 		}
-
 	}, [morse]);
 
 	return (
 		<div className="App" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+			<button className='help-button' onClick={() => { setModalHelp(true); }}>?</button>
+
 			<div className='content'>
 				<p id='sentence'>{sentence}</p>
 				<p id='morse'>{morse}</p>
 				<p id='solution'>
 					{solution.split('').map((char, index) => {
 						let color = sentence[index] === char ? 'green' : 'red';
-						return <span style={{ color: color }}>{char}</span>
+						return <span key={`solution-${index}`} style={{ color: color }}>{char}</span>
 					})}
 				</p>
 				<p id='score'>
 					{formatTime(elapsedTime)}
-					
+
 					&nbsp;Sentences written: {user ? user.score : <><button onClick={() => navigate("/register")}>Register</button>/<button onClick={() => navigate("/login")}>Login</button></>}
 				</p>
 			</div>
 
 			<div className='bottom-buttons' onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
 				<button onClick={() => {
-					setMorse(prev => prev + "/")
-					clearTimeout(timerId.current);
-				}}>End Letter</button>
-
-				<button onClick={() => {
 					setMorse(prev => prev + "-.-.-./")
 					clearTimeout(timerId.current);
 				}}>Space</button>
+
+				<button onClick={() => {
+					setMorse(prev => prev + "/")
+					clearTimeout(timerId.current);
+				}}>End Letter</button>
 
 				<button onClick={() => {
 					setMorse(prev => {
@@ -270,48 +252,9 @@ const MorsePage = () => {
 				}}>Backspace</button>
 			</div>
 
-			<button className='help-button' onClick={() => { setShowModal(true); }}>?</button>
-
-			{showModal && <div className='modal'>
-				<div className='modal-content'>
-					<div className='modal-close' onClick={() => { setShowModal(false); }}>x</div>
-
-					<div>
-						<h2>Instructions</h2>
-						<p>For PC users, any other keys then backspace and space insert dash or dot. Space forces to end letter and backspace erases most recent letter.</p>
-						<p>The "Space" button inserts -.-.-. which is ";". The semicolon inserts space into the solution.</p>
-
-						<h2>Credit</h2>
-						<p>Made by Jan Kubát<br /><a href='https://jankubat-it.cz/'>https://jankubat-it.cz/</a></p>
-
-						<h2>Morse Code</h2>
-						<table>
-							<tbody>
-								{Object.keys(morseCode).map((key) => {
-									return <tr>
-										<td>{key}</td>
-										<td>{morseCode[key]}</td>
-									</tr>
-								})}
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>}
-
-			{modalCompleted && <div className='modal'>
-				<div className='modal-content'>
-					<div className='modal-close' onClick={handleComplete}>x</div>
-
-					<div>
-						<h2>Sentence completed!</h2>
-						<p>Time to complete: {formatTime(stats.ttc)}</p>
-						<p>Mistakes: {stats.mistakes.length}</p>
-					</div>
-
-					<button onClick={handleComplete}>Next</button>
-				</div>
-			</div>}
+			{/* Modals */}
+			{modalHelp && <ModalHelp setShowModal={setModalHelp} />}
+			{modalCompleted && <ModalCompleted stats={stats} handleComplete={handleComplete} />}
 		</div>
 	);
 }
