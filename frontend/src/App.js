@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { MorsePage, RegisterPage } from "./pages";
-import LoginPage from "./pages/login";
+import { MorsePage, RegisterPage, LoginPage } from "./pages";
 
 function App() {
   return (

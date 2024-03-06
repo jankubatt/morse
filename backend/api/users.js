@@ -9,7 +9,7 @@ const { v4: uuidv4 } = require('uuid');
 router.post("/", (req, res) => {
     let token = req.body.token;
 
-    let sql = 'SELECT * FROM users WHERE authToken = ?';
+    let sql = `SELECT users.*, COUNT(sentences.id) AS 'score' FROM users JOIN sentences ON users.id = sentences.id_user WHERE users.authToken = ?`;
     let values = [token];
 
     db.query(sql, values, (err, result) => {
@@ -100,6 +100,26 @@ router.post("/login", (req, res) => {
         db.query(sql, values, (err, result) => {
             res.send(token).status(200);
         });
+    });
+});
+
+router.post("/sentence/done", (req, res) => {
+    let id_user = req.body.id_user;
+    let sentence = req.body.sentence;
+    let ttc = req.body.ttc;
+    let mistakes = req.body.mistakes;
+
+    let sql = 'INSERT INTO sentences (id_user, sentence, ttc, mistakes) VALUES (?, ?, ?, ?)';
+    let values = [id_user, sentence, ttc, mistakes];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.sendStatus(500);
+            return;
+        }
+
+        res.sendStatus(200);
     });
 });
 

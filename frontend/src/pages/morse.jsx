@@ -3,6 +3,7 @@ import '../App.css';
 import React, { useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import { Stopwatch } from '../components';
 
 const MorsePage = () => {
 	const morseCode = {
@@ -16,9 +17,18 @@ const MorsePage = () => {
 	const [sentences, setSentences] = useState([])
 	const [sentence, setSentence] = useState('')
 	const [showModal, setShowModal] = useState(false)
-    const [user, setUser] = useState({});
+	const [modalCompleted, setModalCompleted] = useState(false)
+	const [user, setUser] = useState(null);
 
-    const navigate = useNavigate();
+	const [stats, setStats] = useState({
+		ttc: 0,	//Time to complete
+		mistakes: [],	//Mistakes
+	});	//Current sentence stats
+	const [startTime, setStartTime] = useState(0)	//Start time of current sentence
+	const [elapsedTime, setElapsedTime] = useState(0);
+	const [isRunning, setIsRunning] = useState(true);
+
+	const navigate = useNavigate();
 
 	const timerId = useRef(null);
 	const touchStart = useRef(0);
@@ -51,23 +61,65 @@ const MorsePage = () => {
 		}, 2000);
 	};
 
-    const fetchUser = async () => {
-        const response = await axios.post(`${process.env.REACT_APP_API}/users/`, { token: Cookies.get("token") });
-        return response.data;
-    };
+	const fetchUser = async () => {
+		const response = await axios.post(`${process.env.REACT_APP_API}/users/`, { token: Cookies.get("token") });
+		return response.data;
+	};
 
-    useEffect(() => {
-        fetchUser().then((data) => {
-            setUser(data);
-        });
-    }, []);
+	const formatTime = (milliseconds) => {
+		const totalMilliseconds = Math.floor(milliseconds);
+		const minutes = Math.floor(totalMilliseconds / (60 * 1000));
+		const seconds = Math.floor((totalMilliseconds % (60 * 1000)) / 1000);
+		const millisecondsPart = totalMilliseconds % 1000;
+
+		const pad = (value) => (value < 10 ? `0${value}` : value);
+
+		return `${pad(minutes)}:${pad(seconds)}.${pad(millisecondsPart)}`;
+	};
+
+	const handleComplete = () => {
+		fetchUser().then((data) => {
+			setUser(data);
+		}).catch((e) => setUser(null));
+		
+		setSentence(sentences[Math.floor(Math.random() * sentences.length)].toUpperCase().replace(".", ""))
+		setMorse('')
+		setModalCompleted(false);
+		setStats({
+			ttc: 0,
+			mistakes: []
+		})
+		setIsRunning(true);
+	}
 
 	useEffect(() => {
-		fetch('/sentences.json')
+		fetchUser().then((data) => {
+			setUser(data);
+		}).catch((e) => setUser(null));
+	}, []);
+
+	useEffect(() => {
+		let interval;
+
+		if (isRunning) {
+			setStartTime(performance.now() - elapsedTime);
+			interval = setInterval(() => {
+				setElapsedTime(performance.now() - startTime);
+			}, 1);
+		} else {
+			clearInterval(interval);
+		}
+
+		return () => clearInterval(interval);
+	}, [isRunning, startTime, elapsedTime]);
+
+	useEffect(() => {
+		fetch('/test.json')
 			.then(response => response.json())
 			.then(json => {
 				setSentences(json)
 				setSentence(json[Math.floor(Math.random() * json.length)].toUpperCase().replace(".", ""))
+				setStartTime(new Date().getTime())
 			})
 			.catch(error => console.error('Error:', error));
 
@@ -135,16 +187,47 @@ const MorsePage = () => {
 		})
 		setSolution(solutionArray.join('').replaceAll(";", " "))
 
-		if (solution === sentence && sentences.length > 0) {
-			if (localStorage.getItem('score') === null) {
-				localStorage.setItem('score', '1')
-			} else {
-				localStorage.setItem('score', (parseInt(localStorage.getItem('score')) + 1).toString())
-			}
+		if (morseArray[morseArray.length - 1] === "" && morseArray.length > 1) {
+			// console.log(morseArray)
+			// console.log(solution, sentence)
 
-			setSentence(sentences[Math.floor(Math.random() * sentences.length)].toUpperCase().replace(".", ""))
-			setMorse('')
+			for (let i = 0; i < solution.length; i++) {
+				if (solution[i] !== sentence[i] && stats.mistakes.filter(mistake => mistake.index === i).length === 0) {
+					setStats(prev => {
+						return {
+							...prev,
+							mistakes: prev.mistakes.concat({ index: i, correct: sentence[i], wrong: solution[i] })
+						}
+					})
+				}
+			}
 		}
+
+		if (solution === sentence && sentences.length > 0 && elapsedTime > 0 && modalCompleted === false) {
+			let ttc = elapsedTime;
+			setStats(prev => {
+				return {
+					...prev,
+					ttc
+				}
+			})
+			setStartTime(0)
+			setElapsedTime(0)
+			setIsRunning(false);
+			setModalCompleted(true);
+
+			if (user) {
+				axios.post(`${process.env.REACT_APP_API}/users/sentence/done`, {
+					id_user: user.id,
+					sentence: sentence,
+					ttc: ttc,
+					mistakes: stats.mistakes.length
+				}).then((response) => {
+					console.log("saved")
+				}).catch((e) => console.error(e));
+			}
+		}
+
 	}, [morse]);
 
 	return (
@@ -159,9 +242,10 @@ const MorsePage = () => {
 					})}
 				</p>
 				<p id='score'>
-                    {user ? user.username : <><button onClick={() => navigate("/register")}>Register</button>/<button onClick={() => navigate("/login")}>Login</button></>}
-                    &nbsp;Sentences written: {localStorage.getItem('score') || 0}
-                </p>
+					{formatTime(elapsedTime)}
+					
+					&nbsp;Sentences written: {user ? user.score : <><button onClick={() => navigate("/register")}>Register</button>/<button onClick={() => navigate("/login")}>Login</button></>}
+				</p>
 			</div>
 
 			<div className='bottom-buttons' onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
@@ -196,9 +280,9 @@ const MorsePage = () => {
 						<h2>Instructions</h2>
 						<p>For PC users, any other keys then backspace and space insert dash or dot. Space forces to end letter and backspace erases most recent letter.</p>
 						<p>The "Space" button inserts -.-.-. which is ";". The semicolon inserts space into the solution.</p>
-						
+
 						<h2>Credit</h2>
-						<p>Made by Jan Kubát<br/><a href='https://jankubat-it.cz/'>https://jankubat-it.cz/</a></p>
+						<p>Made by Jan Kubát<br /><a href='https://jankubat-it.cz/'>https://jankubat-it.cz/</a></p>
 
 						<h2>Morse Code</h2>
 						<table>
@@ -212,6 +296,20 @@ const MorsePage = () => {
 							</tbody>
 						</table>
 					</div>
+				</div>
+			</div>}
+
+			{modalCompleted && <div className='modal'>
+				<div className='modal-content'>
+					<div className='modal-close' onClick={handleComplete}>x</div>
+
+					<div>
+						<h2>Sentence completed!</h2>
+						<p>Time to complete: {formatTime(stats.ttc)}</p>
+						<p>Mistakes: {stats.mistakes.length}</p>
+					</div>
+
+					<button onClick={handleComplete}>Next</button>
 				</div>
 			</div>}
 		</div>
