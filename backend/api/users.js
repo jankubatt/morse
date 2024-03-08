@@ -8,6 +8,11 @@ const { v4: uuidv4 } = require('uuid');
 
 router.post("/", (req, res) => {
     let token = req.body.token;
+    
+    if (!token) {
+        res.sendStatus(400);
+        return;
+    }
 
     let sql = `SELECT users.*, COUNT(sentences.id) AS 'score' FROM users JOIN sentences ON users.id = sentences.id_user WHERE users.authToken = ?`;
     let values = [token];
@@ -24,6 +29,7 @@ router.post("/", (req, res) => {
             return;
         }
 
+        console.log(result[0])
         res.send(result[0]).status(200);
     });
 });
@@ -120,6 +126,21 @@ router.post("/sentence/done", (req, res) => {
         }
 
         res.sendStatus(200);
+    });
+});
+
+router.post("/leaderboard", (req, res) => {
+    let sql = `SELECT users.*, COUNT(sentences.id) AS 'score', (SELECT MIN(ttc) FROM sentences WHERE sentences.id_user = users.id) AS 'ttc' FROM users LEFT JOIN sentences ON users.id = sentences.id_user GROUP BY users.id ORDER BY score DESC`;
+
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.sendStatus(500);
+            return;
+        }
+
+        console.log(result);
+        res.send(result).status(200);
     });
 });
 

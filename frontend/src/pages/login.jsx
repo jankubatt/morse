@@ -17,7 +17,7 @@ const LoginPage = () => {
         axios.post(`${process.env.REACT_APP_API}/users/login`, data)
             .then((res) => {
                 document.cookie = `token=${res.data}`;
-                navigate('/');
+                navigate('/morse');
             })
             .catch((error) => {
                 console.log(error);

@@ -1,8 +1,16 @@
+:root {
+	--text: #ffffff;
+	--background: #302f2c;
+	--primary: #5f94ce;
+	--secondary: #42403e;
+	--accent: #262421;
+}
+
 body {
 	text-align: center;
-	background-color: rgb(16, 15, 37);
-	color: white;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	background-color: var(--background);
+	color: var(--text);
+	font-family: sans-serif;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -10,6 +18,16 @@ body {
 	-ms-user-select: none;
 	-webkit-text-size-adjust: none;
 	user-select: none;
+}
+
+button {
+	cursor: pointer;
+	background-color: var(--primary);
+	color: var(--text);
+	border: none;
+	border-radius: 6px;
+	padding: 8px 16px;
+	box-shadow: var(--boxShadowHover, inset 0 calc(var(--borderHeight, .1rem)*-1) 0 0 rgba(0, 0, 0, .25));
 }
 
 .App {
@@ -35,28 +53,22 @@ body {
 }
 
 #score {
-	position: absolute;
-	bottom: 0;
-	right: 16px;
 	opacity: 0.5;
+	margin: 0;
 }
 
 .bottom-buttons {
 	display: flex;
 	justify-content: space-evenly;
+
 }
 
 .bottom-buttons>button {
-	font-size: 1.5em;
-	padding: 8px;
-	background-color: rgb(16, 15, 37);
-	border: none;
-	box-shadow: 0 0 8px 0 rgba(255, 255, 255, 0.5);
-	border-radius: 8px;
-	color: white;
-	opacity: 0.5;
-	transition: 0.5s;
-
+	height: 15vh;
+	font-size: 1em;
+	width: 100%;
+	border-radius: 0;
+	border: 1px solid var(--background);
 }
 
 .bottom-buttons>button:hover {
@@ -109,4 +121,106 @@ body {
 	opacity: 0.5;
 	transition: 0.5s;
 	width: fit-content;
+}
+
+.menubar {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+	align-items: center;
+}
+
+.menubar>.left {
+	display: flex;
+	gap: 1em;
+	flex-direction: row;
+	height: 1em;
+	align-items: center;
+}
+
+.left>h1 {
+	margin: 0;
+	height: fit-content;
+}
+
+.menubar>.buttons {
+	display: flex;
+	gap: 1em;
+	flex-direction: row;
+	align-items: center;
+}
+
+.buttons>button {
+	font-size: 1.05em;
+}
+
+.home-action-primary {
+	width: 100%;
+	height: 10vh;
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+.menu {
+	position: absolute;
+	background-color: var(--accent);
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	top: 0;
+	left: 0;
+	z-index: 99;
+	overflow: hidden;
+	gap: 1em;
+	padding-top: 10vh;
+}
+
+.menu-item {
+	width: 100%;
+	height: 10vh;
+	font-size: 1.5em;
+	background-color: var(--background);
+	color: var(--text);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.leaderboard {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.leaderboard th, .leaderboard td {
+    padding: 8px;
+    text-align: center;
+}
+
+.leaderboard th {
+    background-color: var(--accent);
+}
+
+/* Optional: Add styling for alternating row colors */
+.leaderboard tbody tr:nth-child(even) {
+    background-color: var(--secondary);
+}
+
+.leaderboard tbody tr:nth-child(1) td:nth-child(1) span {
+	background-color: #f7c631;
+	border-radius: 6px;
+	padding: 4px;
+}
+
+.leaderboard tbody tr:nth-child(2) td:nth-child(1) span {
+	background-color: #bebdb9;
+	border-radius: 6px;
+	padding: 4px;
+}
+
+.leaderboard tbody tr:nth-child(3) td:nth-child(1) span {
+	background-color: #d5a47d;
+	border-radius: 6px;
+	padding: 4px;
 }

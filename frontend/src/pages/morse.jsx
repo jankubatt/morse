@@ -3,7 +3,7 @@ import '../App.css';
 import React, { useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
-import { ModalCompleted, ModalHelp, Stopwatch } from '../components';
+import { MenuBar, ModalCompleted, ModalHelp } from '../components';
 import { formatTime, morseCode } from '../helpers';
 
 const MorsePage = () => {
@@ -24,6 +24,7 @@ const MorsePage = () => {
 	const [isRunning, setIsRunning] = useState(true);
 
 	const navigate = useNavigate();
+	const morseRef = useRef(null);
 
 	const timerId = useRef(null);
 	const touchStart = useRef(0);
@@ -208,54 +209,58 @@ const MorsePage = () => {
 				}).catch((e) => console.error(e));
 			}
 		}
+
+		morseRef.current.scrollTop = morseRef.current.scrollHeight;
 	}, [morse]);
 
 	return (
-		<div className="App" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-			<button className='help-button' onClick={() => { setModalHelp(true); }}>?</button>
+		<>
+			<MenuBar user={user} />
 
-			<div className='content'>
-				<p id='sentence'>{sentence}</p>
-				<p id='morse'>{morse}</p>
-				<p id='solution'>
-					{solution.split('').map((char, index) => {
-						let color = sentence[index] === char ? 'green' : 'red';
-						return <span key={`solution-${index}`} style={{ color: color }}>{char}</span>
-					})}
-				</p>
-				<p id='score'>
-					{formatTime(elapsedTime)}
 
-					&nbsp;Sentences written: {user ? user.score : <><button onClick={() => navigate("/register")}>Register</button>/<button onClick={() => navigate("/login")}>Login</button></>}
-				</p>
+			<div className="App" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+				{/* <button className='help-button' onClick={() => { setModalHelp(true); }}>?</button> */}
+				{console.log(user)}
+
+				<div className='content'>
+					<p id='score'>{formatTime(elapsedTime)}</p>
+					<p id='sentence'>{sentence}</p>
+					<p id='morse' ref={morseRef}>{morse}</p>
+					<p id='solution'>
+						{solution.split('').map((char, index) => {
+							let color = sentence[index] === char ? 'green' : 'red';
+							return <span key={`solution-${index}`} style={{ color: color }}>{char}</span>
+						})}
+					</p>
+				</div>
+
+				<div className='bottom-buttons' onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
+					<button onClick={() => {
+						setMorse(prev => prev + "-.-.-./")
+						clearTimeout(timerId.current);
+					}}>Space</button>
+
+					<button onClick={() => {
+						setMorse(prev => prev + "/")
+						clearTimeout(timerId.current);
+					}}>End Letter</button>
+
+					<button onClick={() => {
+						setMorse(prev => {
+							let parts = prev.split('/');
+							parts.pop();
+							parts.pop();
+
+							return `${parts.join('/')}/`;
+						})
+					}}>Backspace</button>
+				</div>
+
+				{/* Modals */}
+				{modalHelp && <ModalHelp setShowModal={setModalHelp} />}
+				{modalCompleted && <ModalCompleted stats={stats} handleComplete={handleComplete} />}
 			</div>
-
-			<div className='bottom-buttons' onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
-				<button onClick={() => {
-					setMorse(prev => prev + "-.-.-./")
-					clearTimeout(timerId.current);
-				}}>Space</button>
-
-				<button onClick={() => {
-					setMorse(prev => prev + "/")
-					clearTimeout(timerId.current);
-				}}>End Letter</button>
-
-				<button onClick={() => {
-					setMorse(prev => {
-						let parts = prev.split('/');
-						parts.pop();
-						parts.pop();
-
-						return `${parts.join('/')}/`;
-					})
-				}}>Backspace</button>
-			</div>
-
-			{/* Modals */}
-			{modalHelp && <ModalHelp setShowModal={setModalHelp} />}
-			{modalCompleted && <ModalCompleted stats={stats} handleComplete={handleComplete} />}
-		</div>
+		</>
 	);
 }
 
