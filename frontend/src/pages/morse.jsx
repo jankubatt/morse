@@ -217,10 +217,8 @@ const MorsePage = () => {
 		<>
 			<MenuBar user={user} />
 
-
 			<div className="App" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
 				{/* <button className='help-button' onClick={() => { setModalHelp(true); }}>?</button> */}
-				{console.log(user)}
 
 				<div className='content'>
 					<p id='score'>{formatTime(elapsedTime)}</p>

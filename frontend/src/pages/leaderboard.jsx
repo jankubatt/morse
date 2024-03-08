@@ -87,13 +87,13 @@ const LeaderboardPage = () => {
                 </thead>
                 <tbody>
                     {
-                        leaderboard.map((user, index) => {
+                        leaderboard.map((item, index) => {
                             return (
-                                <tr key={`leaderboard-${user.id}`}>
+                                <tr key={`leaderboard-${item.id}`}>
                                     <td style={{flexGrow: 1}}><span>#{index + 1}</span></td>
-                                    <td style={{flexGrow: 2, textAlign: "left"}}>{user.username} {user.country ? <img width={20} title={countries.filter(c => c.code === user.country)[0].name} alt={user.country} src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${user.country}.svg`}/> : null}</td>
-                                    <td style={{flexGrow: 1}}>{user.score}</td>
-                                    <td style={{flexGrow: 1}}>{user.ttc ? formatTime(user.ttc) : "00:00.000"}</td>
+                                    <td style={{flexGrow: 2, textAlign: "left"}}>{item.username} {item.country ? <img width={20} title={countries.filter(c => c.code === item.country)[0].name} alt={item.country} src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${item.country}.svg`}/> : null} {user?.id === item.id ? "(you)" : null}</td>
+                                    <td style={{flexGrow: 1}}>{item.score}</td>
+                                    <td style={{flexGrow: 1}}>{item.ttc ? formatTime(item.ttc) : "00:00.000"}</td>
                                 </tr>
                             )
                         })

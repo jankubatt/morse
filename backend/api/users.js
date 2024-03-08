@@ -24,12 +24,11 @@ router.post("/", (req, res) => {
             return;
         }
 
-        if (result.length === 0) {
+        if (result.length === 0 || result[0].authToken !== token) {
             res.sendStatus(401);
             return;
         }
 
-        console.log(result[0])
         res.send(result[0]).status(200);
     });
 });
@@ -139,7 +138,6 @@ router.post("/leaderboard", (req, res) => {
             return;
         }
 
-        console.log(result);
         res.send(result).status(200);
     });
 });
