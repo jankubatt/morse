@@ -25,20 +25,20 @@ const LoginPage = () => {
     }
 
     return (
-        <div>
-            <h1>Login Page</h1>
+        <div className="center">
+            <h1>Morse Code Trainer</h1>
 
             <form onSubmit={register}>
-                <label>
-                    Username:
-                    <input type="text" name="username" />
-                </label>
-                <label>
-                    Password:
-                    <input type="password" name="password" />
-                </label>
+                <input type="text" name="username" placeholder="Username" />
+                <input type="password" name="password" placeholder="Password" />
                 <input type="submit" value="Login" />
+
+                
             </form>
+            <div className="underform">
+                    <b>New?</b> <a href="/register">Sign up - and start practicing</a>
+                </div>
+            
         </div>
     );
 }

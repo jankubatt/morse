@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { MorsePage, RegisterPage, LoginPage, HomePage, LeaderboardPage } from "./pages";
+import { MorsePage, RegisterPage, LoginPage, HomePage, LeaderboardPage, AccountPage } from "./pages";
 
 function App() {
   return (
@@ -10,6 +10,7 @@ function App() {
 			<Route path="/register" element={<RegisterPage />} />
 			<Route path="/login" element={<LoginPage />} />
 			<Route path="/leaderboard" element={<LeaderboardPage />} />
+			<Route path="/account" element={<AccountPage />} />
 		</Routes>
     </BrowserRouter>
   );

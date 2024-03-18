@@ -64,28 +64,21 @@ const RegisterPage = () => {
     }, []);
 
     return (
-        <div>
-            <h1>Register Page</h1>
+        <div className="center">
+            <h1>Morse Code Trainer</h1>
 
             {alert && <div className="alert">
-                <p className="alert-texxt">{alertText}</p>
+                <p className="alert-text">{alertText}</p>
             </div>}
 
             <form onSubmit={register}>
-                <label>
-                    Username:<span className="asterisk">*</span>
-                    <input type="text" name="username" />
-                </label>
-                <label>
-                    Password:<span className="asterisk">*</span>
-                    <input type="password" name="password" />
-                </label>
-                <label>
-                    Email:
-                    <input type="email" name="email" />
-                </label>
-                <label>
-                    Country:
+                
+                    <input type="text" name="username" placeholder="Username" />
+                
+                    <input type="password" name="password" placeholder="Password" />
+                
+                    <input type="email" name="email" placeholder="Email" />
+               
                     <select defaultValue={"null"} name="country">
                         <option value="null">No country</option>
                         {
@@ -94,8 +87,8 @@ const RegisterPage = () => {
                             })
                         }
                     </select>
-                </label>
-                <input type="submit" value="Register" />
+              
+                <input type="submit" value="Sign Up" />
             </form>
         </div>
     );

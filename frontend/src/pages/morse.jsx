@@ -78,9 +78,12 @@ const MorsePage = () => {
 	}
 
 	useEffect(() => {
+		setIsRunning(false);
 		fetchUser().then((data) => {
 			setUser(data);
 		}).catch((e) => setUser(null));
+
+		setIsRunning(true);
 	}, []);
 
 	useEffect(() => {
@@ -90,13 +93,13 @@ const MorsePage = () => {
 			setStartTime(performance.now() - elapsedTime);
 			interval = setInterval(() => {
 				setElapsedTime(performance.now() - startTime);
-			}, 1);
+			}, 10);
 		} else {
 			clearInterval(interval);
 		}
 
 		return () => clearInterval(interval);
-	}, [isRunning, startTime, elapsedTime]);
+	}, [isRunning]);
 
 	useEffect(() => {
 		fetch('/sentences.json')

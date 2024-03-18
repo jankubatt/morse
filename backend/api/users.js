@@ -142,4 +142,44 @@ router.post("/leaderboard", (req, res) => {
     });
 });
 
+router.post("/edit", (req, res) => {
+    console.log(req.body);
+    let username = req.body.username;
+    let email = req.body.email;
+    let country = req.body.country;
+
+    if (email === '') email = null;
+    if (country === 'null') country = null;
+
+    let sql = 'UPDATE users SET email = ?, country = ? WHERE username = ?';
+    let values = [email, country, username];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.sendStatus(500);
+            return;
+        }
+
+        res.sendStatus(200);
+    });
+});
+
+router.post("/password/change", (req, res) => {
+    let password = bcrypt.hashSync(req.body.password, 10);
+
+    let sql = 'UPDATE users SET password = ? WHERE id = ?';
+    let values = [password, req.body.id_user];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.sendStatus(500);
+            return;
+        }
+
+        res.sendStatus(200);
+    });
+});
+
 module.exports = router;

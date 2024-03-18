@@ -61,9 +61,12 @@ const LeaderboardPage = () => {
             setLeaderboard(data);
         }).catch((e) => console.log(e));
 
-        fetchCountries().then((data) => {
-            setCountries(data);
-        }).catch((e) => console.log(e));
+        fetch('/countries.json')
+			.then(response => response.json())
+			.then(json => {
+				setCountries(json)
+			})
+			.catch(error => console.error('Error:', error));
 	}, []);
 
     if (!leaderboard || countries.length === 0) {
