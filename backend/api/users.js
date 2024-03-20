@@ -14,7 +14,7 @@ router.post("/", (req, res) => {
         return;
     }
 
-    let sql = `SELECT users.*, COUNT(sentences.id) AS 'score' FROM users JOIN sentences ON users.id = sentences.id_user WHERE users.authToken = ?`;
+    let sql = `SELECT users.*, COUNT(sentences.id) AS 'score' FROM users LEFT JOIN sentences ON users.id = sentences.id_user WHERE users.authToken = ?`;
     let values = [token];
 
     db.query(sql, values, (err, result) => {

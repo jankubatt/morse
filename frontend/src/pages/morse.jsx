@@ -74,6 +74,8 @@ const MorsePage = () => {
 			ttc: 0,
 			mistakes: []
 		})
+		setElapsedTime(0);
+		setStartTime(performance.now());
 		setIsRunning(true);
 	}
 
@@ -96,6 +98,8 @@ const MorsePage = () => {
 			}, 10);
 		} else {
 			clearInterval(interval);
+			setElapsedTime(0);
+			setStartTime(0);
 		}
 
 		return () => clearInterval(interval);
@@ -107,7 +111,7 @@ const MorsePage = () => {
 			.then(json => {
 				setSentences(json)
 				setSentence(json[Math.floor(Math.random() * json.length)].toUpperCase().replace(".", ""))
-				setStartTime(new Date().getTime())
+				setStartTime(0)
 			})
 			.catch(error => console.error('Error:', error));
 
